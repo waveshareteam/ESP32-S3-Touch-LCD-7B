@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "esp_err.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "io_extension.h"
@@ -24,6 +25,8 @@
 #include "freertos/task.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
+#include "esp_lcd_touch.h"
+#include "esp_lv_adapter.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// Please update the following configuration according to your LCD spec //////////////////////////////
@@ -90,15 +93,19 @@
 /**
  * @brief Function Declarations
  */
-esp_lcd_panel_handle_t waveshare_esp32_s3_rgb_lcd_init();
+esp_err_t waveshare_esp32_s3_rgb_lcd_init(esp_lv_adapter_tear_avoid_mode_t tear_mode,
+                                          esp_lv_adapter_rotation_t rotation,
+                                          esp_lcd_panel_handle_t *panel_handle,
+                                          esp_lcd_touch_handle_t *touch_handle);
 /**
  * @brief Turn on the LCD backlight.
  */
-void wavesahre_rgb_lcd_bl_on();
+esp_lcd_touch_handle_t touch_gt911_init(void);
+void wavesahre_rgb_lcd_bl_on(void);
 /**
  * @brief Turn off the LCD backlight.
  */
-void wavesahre_rgb_lcd_bl_off();
+void wavesahre_rgb_lcd_bl_off(void);
 
 /**
  * @brief Display a rectangular region of an image on the RGB LCD.
@@ -125,7 +132,6 @@ void wavesahre_rgb_lcd_display(uint8_t *Image);
  * @param buf2 Pointer to hold the address of the second frame buffer.
  */
 void waveshare_get_frame_buffer(void **buf1, void **buf2);
-
 void waveahre_rgb_lcd_set_pclk(uint32_t freq_hz);
-void waveshare_rgb_lcd_restart();
+void waveshare_rgb_lcd_restart(void);
 #endif // _RGB_LCD_H_

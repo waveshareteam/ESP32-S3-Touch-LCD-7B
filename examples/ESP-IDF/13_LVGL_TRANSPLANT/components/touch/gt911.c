@@ -274,7 +274,7 @@ static esp_err_t esp_lcd_touch_gt911_read_data(esp_lcd_touch_handle_t tp)
         portENTER_CRITICAL(&tp->data.lock);
 
         /* Number of touched points */
-        touch_cnt = (touch_cnt > ESP_LCD_TOUCH_MAX_POINTS ? ESP_LCD_TOUCH_MAX_POINTS : touch_cnt);
+        touch_cnt = (touch_cnt > CONFIG_ESP_LCD_TOUCH_MAX_POINTS ? CONFIG_ESP_LCD_TOUCH_MAX_POINTS : touch_cnt);
         tp->data.points = touch_cnt;
 
         /* Fill all coordinates */
@@ -413,21 +413,6 @@ esp_lcd_touch_handle_t touch_gt911_init()
 
     return tp_handle;  // Return the touch controller handle
 }
-
-// Function to read touch points from the GT911 touch controller
-touch_gt911_point_t touch_gt911_read_point(uint8_t max_touch_cnt)
-{
-    touch_gt911_point_t data;  // Declare a structure to hold touch point data
-
-    /* Read touch data from the touch controller */
-    esp_lcd_touch_read_data(tp_handle);  // Read raw data from the touch controller
-
-    /* Get the touch coordinates and count of touch points */
-    esp_lcd_touch_get_coordinates(tp_handle, data.x, data.y, NULL, &data.cnt, max_touch_cnt);
-
-    return data;  // Return the touch point data
-}
-
 
 /*******************************************************************************
 * Private API function

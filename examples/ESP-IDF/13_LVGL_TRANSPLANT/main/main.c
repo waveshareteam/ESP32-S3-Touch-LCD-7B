@@ -1,53 +1,56 @@
-/*****************************************************************************
- * | File       :   main.c
- * | Author     :   Waveshare team
- * | Function   :   Main function
- * | Info       :   
- * |                Ported LVGL 8.4 and display the official demo interface
- *----------------
- * | Version    :   V1.0
- * | Date       :   2024-12-06
- * | Info       :   Basic version
- *
- ******************************************************************************/
+#include <assert.h>
 
-#include "rgb_lcd_port.h"    // Header for Waveshare RGB LCD driver
-#include "gt911.h"           // Header for touch screen operations (GT911)
+#include "esp_log.h"
+#include "esp_lv_adapter.h"
+#include "lv_demos.h"
 
-#include "lv_demos.h"        // LVGL demo headers
-#include "lvgl_port.h"       // LVGL porting functions for integration
+#include "rgb_lcd_port.h"
 
-static const char *TAG = "main";  // Tag for logging
+static const char *TAG = "main";
 
-// Main application function
-void app_main()
+void app_main(void)
 {
-    static esp_lcd_panel_handle_t panel_handle = NULL; // Declare a handle for the LCD panel
-    static esp_lcd_touch_handle_t tp_handle = NULL;    // Declare a handle for the touch panel
+    const esp_lv_adapter_rotation_t rotation = ESP_LV_ADAPTER_ROTATE_0;
+    const esp_lv_adapter_tear_avoid_mode_t tear_mode = ESP_LV_ADAPTER_TEAR_AVOID_MODE_DEFAULT_RGB;
 
-    // Initialize the GT911 touch screen controller
-    tp_handle = touch_gt911_init();  
-    
-    // Initialize the Waveshare ESP32-S3 RGB LCD hardware
-    panel_handle = waveshare_esp32_s3_rgb_lcd_init(); 
+    esp_lcd_panel_handle_t panel_handle = NULL;
+    esp_lcd_touch_handle_t tp_handle = NULL;
 
-    // Turn on the LCD backlight
-    wavesahre_rgb_lcd_bl_on();   
+    ESP_ERROR_CHECK(waveshare_esp32_s3_rgb_lcd_init(
+        tear_mode,
+        rotation,
+        &panel_handle,
+        &tp_handle));
 
-    // Initialize LVGL with the panel and touch handles
-    ESP_ERROR_CHECK(lvgl_port_init(panel_handle, tp_handle));
+    wavesahre_rgb_lcd_bl_on();
+
+    esp_lv_adapter_config_t adapter_config = ESP_LV_ADAPTER_DEFAULT_CONFIG();
+    adapter_config.task_stack_size = 12 * 1024;
+    adapter_config.stack_in_psram = true;
+    ESP_ERROR_CHECK(esp_lv_adapter_init(&adapter_config));
+
+    esp_lv_adapter_display_config_t disp_config = ESP_LV_ADAPTER_DISPLAY_RGB_DEFAULT_CONFIG(
+        panel_handle,
+        NULL,
+        EXAMPLE_LCD_H_RES,
+        EXAMPLE_LCD_V_RES,
+        rotation);
+    disp_config.profile.use_psram = true;
+
+    lv_display_t *disp = esp_lv_adapter_register_display(&disp_config);
+    assert(disp != NULL);
+
+    if (tp_handle != NULL) {
+        esp_lv_adapter_touch_config_t touch_config = ESP_LV_ADAPTER_TOUCH_DEFAULT_CONFIG(disp, tp_handle);
+        lv_indev_t *touch = esp_lv_adapter_register_touch(&touch_config);
+        assert(touch != NULL);
+    }
+
+    ESP_ERROR_CHECK(esp_lv_adapter_start());
 
     ESP_LOGI(TAG, "Display LVGL demos");
-
-    // Lock the mutex because LVGL APIs are not thread-safe
-    if (lvgl_port_lock(-1)) {
-        // Uncomment and run the desired demo functions here
-        // lv_demo_stress();  // Stress test demo
-        // lv_demo_benchmark(); // Benchmark demo
-        // lv_demo_music();     // Music demo
-        lv_demo_widgets();    // Widgets demo
-        
-        // Release the mutex after the demo execution
-        lvgl_port_unlock();
+    if (esp_lv_adapter_lock(-1) == ESP_OK) {
+        lv_demo_widgets();
+        esp_lv_adapter_unlock();
     }
 }

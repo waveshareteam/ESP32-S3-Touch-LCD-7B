@@ -1,0 +1,10 @@
+dependencies:
+  idf:
+    version: ">=5.5.0"
+
+  lvgl/lvgl:
+    version: "^9"
+    public: true
+
+  espressif/esp_lvgl_adapter:
+    version: "^0.5.2"

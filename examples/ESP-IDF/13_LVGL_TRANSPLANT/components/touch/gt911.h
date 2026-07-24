@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "touch.h"
+#include "esp_lcd_touch.h"
 
 /**
  * @brief I2C address of the GT911 controller
@@ -32,18 +32,6 @@
 typedef struct {
     uint8_t dev_addr;  /*!< I2C device address */
 } esp_lcd_touch_io_gt911_config_t;
-
-/**
- * @brief Touch data structure for GT911
- *
- * This structure holds the touch point data, including the coordinates and
- * the number of touches detected by the controller.
- */
-typedef struct {
-    uint16_t x[ESP_LCD_TOUCH_MAX_POINTS];  /*!< X coordinates of touch points */
-    uint16_t y[ESP_LCD_TOUCH_MAX_POINTS];  /*!< Y coordinates of touch points */
-    uint8_t cnt;                          /*!< Number of detected touch points */
-} touch_gt911_point_t;
 
 /**
  * @brief Create a new GT911 touch driver instance
@@ -71,17 +59,6 @@ esp_err_t esp_lcd_touch_new_i2c_gt911(const esp_lcd_panel_io_handle_t io, const 
  * @return Touch handle for the initialized controller
  */
 esp_lcd_touch_handle_t touch_gt911_init();
-
-/**
- * @brief Read touch points from the GT911 touch controller
- *
- * This function reads the touch points detected by the GT911 controller and returns
- * the coordinates of the touch points.
- *
- * @param max_touch_cnt Maximum number of touch points to read.
- * @return A structure containing the coordinates and the number of detected touch points.
- */
-touch_gt911_point_t touch_gt911_read_point(uint8_t max_touch_cnt);
 
 /**
  * @brief Touch IO configuration structure for GT911

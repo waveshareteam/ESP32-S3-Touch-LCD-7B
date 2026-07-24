@@ -1,8 +1,10 @@
 dependencies:
   idf:
-    version: ">=5.1.0"
+    version: ">=5.5.0"
   lvgl/lvgl:
-    version: ">8.3.9,<9"  
-    override_path: "../components/lvgl_port/lvgl__lvgl"
+    version: ">8.3.9,<9"
+    public: true
 
+  espressif/esp_lvgl_adapter:
+    version: "^0.5.2"
 
