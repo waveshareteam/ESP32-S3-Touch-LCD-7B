@@ -20,12 +20,14 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
+#include "driver/gpio.h"
 #include "io_extension.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_touch.h"
+#include "esp_lcd_touch_gt911.h"
 #include "esp_lv_adapter.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +92,9 @@
 #define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL   (1)    ///< Logic level to turn on backlight
 #define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL  (!EXAMPLE_LCD_BK_LIGHT_ON_LEVEL) ///< Logic level to turn off backlight
 
+#define EXAMPLE_TOUCH_RST_GPIO          (-1)
+#define EXAMPLE_TOUCH_INT_GPIO          (GPIO_NUM_4)
+
 /**
  * @brief Function Declarations
  */
@@ -100,7 +105,6 @@ esp_err_t waveshare_esp32_s3_rgb_lcd_init(esp_lv_adapter_tear_avoid_mode_t tear_
 /**
  * @brief Turn on the LCD backlight.
  */
-esp_lcd_touch_handle_t touch_gt911_init(void);
 void wavesahre_rgb_lcd_bl_on(void);
 /**
  * @brief Turn off the LCD backlight.
