@@ -1,7 +1,7 @@
 ﻿| Supported Targets | ESP32-S3 |
 | ----------------- | -------- |
 
-# 13_LVGL_TRANSPLANT
+# 13_lvgl_v8_demo
 
 ## 功能说明
 
