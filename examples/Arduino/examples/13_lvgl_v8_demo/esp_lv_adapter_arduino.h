@@ -123,7 +123,7 @@
  *      - ESP_ERR_INVALID_ARG: Invalid argument
  *      - Others: Fail
  */
-esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle);
+esp_err_t esp_lv_adapter_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle);
 
 /**
  * @brief Take LVGL mutex
@@ -134,13 +134,13 @@ esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle
  *      - true:  Mutex was taken
  *      - false: Mutex was NOT taken
  */
-bool lvgl_port_lock(int timeout_ms);
+bool esp_lv_adapter_lock(int timeout_ms);
 
 /**
  * @brief Give LVGL mutex
  *
  */
-void lvgl_port_unlock(void);
+void esp_lv_adapter_unlock(void);
 
 /**
  * @brief Notifies the LVGL task when the transmission of the RGB frame buffer is completed.
@@ -149,4 +149,4 @@ void lvgl_port_unlock(void);
  *      - true:  The tasks need to be re-scheduled
  *      - false: The tasks don't need to be re-scheduled
  */
-bool lvgl_port_notify_rgb_vsync(void);
+bool esp_lv_adapter_notify_rgb_vsync(void);

@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #include "rgb_lcd_port.h"
-#include "lvgl_port.h"
+#include "esp_lv_adapter_arduino.h"
 
 const char *TAG = "example";
 
@@ -22,7 +22,7 @@ static esp_lcd_panel_handle_t panel_handle = NULL; // Declare a handle for the L
 // VSYNC event callback function
 IRAM_ATTR static bool rgb_lcd_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *edata, void *user_ctx)
 {
-    return lvgl_port_notify_rgb_vsync();
+    return esp_lv_adapter_notify_rgb_vsync();
 }
 
 /**

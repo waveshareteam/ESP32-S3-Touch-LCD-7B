@@ -1,8 +1,12 @@
 /*
 * Ported LVGL 8.4 and display the official demo interface.
 */
-#include "lvgl_port.h"       // LVGL porting functions for integration
-#include <demos/lv_demos.h>        // LVGL demo headers
+#include <esp_log.h>
+
+#include "esp_lv_adapter_arduino.h"
+#include <demos/lv_demos.h>
+
+static const char *TAG = "lvgl8_demo";
 
 void setup() {
     static esp_lcd_panel_handle_t panel_handle = NULL; // Declare a handle for the LCD panel
@@ -18,12 +22,12 @@ void setup() {
     wavesahre_rgb_lcd_bl_on();   
 
     // Initialize LVGL with the panel and touch handles
-    ESP_ERROR_CHECK(lvgl_port_init(panel_handle, tp_handle));
+    ESP_ERROR_CHECK(esp_lv_adapter_init(panel_handle, tp_handle));
 
     ESP_LOGI(TAG, "Display LVGL demos");
 
     // Lock the mutex because LVGL APIs are not thread-safe
-    if (lvgl_port_lock(-1)) {
+    if (esp_lv_adapter_lock(-1)) {
         // Uncomment and run the desired demo functions here
         // lv_demo_stress();  // Stress test demo
         // lv_demo_benchmark(); // Benchmark demo
@@ -31,7 +35,7 @@ void setup() {
         lv_demo_widgets();    // Widgets demo
         
         // Release the mutex after the demo execution
-        lvgl_port_unlock();
+        esp_lv_adapter_unlock();
     }
 }
 

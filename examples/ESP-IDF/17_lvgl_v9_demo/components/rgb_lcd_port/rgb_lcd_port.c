@@ -1,5 +1,8 @@
 #include "rgb_lcd_port.h"
 
+#include "gpio.h"
+#include "i2c.h"
+
 const char *TAG = "example";
 static esp_lcd_panel_handle_t panel_handle = NULL;
 esp_err_t waveshare_esp32_s3_rgb_lcd_init(esp_lv_adapter_tear_avoid_mode_t tear_mode,
@@ -58,7 +61,38 @@ esp_err_t waveshare_esp32_s3_rgb_lcd_init(esp_lv_adapter_tear_avoid_mode_t tear_
     ESP_LOGI(TAG, "Initialize RGB LCD panel");
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
     *out_panel_handle = panel_handle;
-    *out_touch_handle = touch_gt911_init();
+
+    DEV_I2C_Port port = DEV_I2C_Init();
+    IO_EXTENSION_Init();
+    DEV_GPIO_Mode(EXAMPLE_TOUCH_INT_GPIO, GPIO_MODE_INPUT_OUTPUT);
+    IO_EXTENSION_Output(IO_EXTENSION_IO_1, 0);
+    vTaskDelay(pdMS_TO_TICKS(100));
+    DEV_Digital_Write(EXAMPLE_TOUCH_INT_GPIO, 0);
+    vTaskDelay(pdMS_TO_TICKS(100));
+    IO_EXTENSION_Output(IO_EXTENSION_IO_1, 1);
+    vTaskDelay(pdMS_TO_TICKS(200));
+
+    esp_lcd_panel_io_handle_t tp_io_handle = NULL;
+    esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG();
+    tp_io_config.scl_speed_hz = EXAMPLE_I2C_MASTER_FREQUENCY;
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c(port.bus, &tp_io_config, &tp_io_handle));
+
+    const esp_lcd_touch_config_t tp_cfg = {
+        .x_max = EXAMPLE_LCD_H_RES,
+        .y_max = EXAMPLE_LCD_V_RES,
+        .rst_gpio_num = EXAMPLE_TOUCH_RST_GPIO,
+        .int_gpio_num = EXAMPLE_TOUCH_INT_GPIO,
+        .levels = {
+            .reset = 0,
+            .interrupt = 0,
+        },
+        .flags = {
+            .swap_xy = 0,
+            .mirror_x = 0,
+            .mirror_y = 0,
+        },
+    };
+    ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_gt911(tp_io_handle, &tp_cfg, out_touch_handle));
     return ESP_OK;
 }
 

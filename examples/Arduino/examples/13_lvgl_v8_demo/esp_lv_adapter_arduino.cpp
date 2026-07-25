@@ -5,7 +5,7 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_timer.h"
 #include "esp_log.h"
-#include "lvgl_port.h"
+#include "esp_lv_adapter_arduino.h"
 
 static const char *TAG = "lv_port";                      // Tag for logging
 static SemaphoreHandle_t lvgl_mux;                       // LVGL mutex for synchronization
@@ -481,9 +481,9 @@ static void lvgl_port_task(void *arg)
 
     uint32_t task_delay_ms = LVGL_PORT_TASK_MAX_DELAY_MS; // Set initial task delay
     while (1) {
-        if (lvgl_port_lock(-1)) { // Try to lock the LVGL mutex
+        if (esp_lv_adapter_lock(-1)) { // Try to lock the LVGL mutex
             task_delay_ms = lv_timer_handler(); // Handle LVGL timer events
-            lvgl_port_unlock(); // Unlock the mutex
+            esp_lv_adapter_unlock(); // Unlock the mutex
         }
         // Ensure the delay time is within limits
         if (task_delay_ms > LVGL_PORT_TASK_MAX_DELAY_MS) {
@@ -495,7 +495,7 @@ static void lvgl_port_task(void *arg)
     }
 }
 
-esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle)
+esp_err_t esp_lv_adapter_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle)
 {
     lv_init(); // Initialize LVGL
     ESP_ERROR_CHECK(tick_init()); // Initialize the tick timer
@@ -535,21 +535,21 @@ esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle
     return ESP_OK; // Return success
 }
 
-bool lvgl_port_lock(int timeout_ms)
+bool esp_lv_adapter_lock(int timeout_ms)
 {
-    assert(lvgl_mux && "lvgl_port_init must be called first"); // Ensure the mutex is initialized
+    assert(lvgl_mux && "esp_lv_adapter_init must be called first"); // Ensure the mutex is initialized
 
     const TickType_t timeout_ticks = (timeout_ms < 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms); // Convert timeout to ticks
     return xSemaphoreTakeRecursive(lvgl_mux, timeout_ticks) == pdTRUE; // Try to take the mutex
 }
 
-void lvgl_port_unlock(void)
+void esp_lv_adapter_unlock(void)
 {
-    assert(lvgl_mux && "lvgl_port_init must be called first"); // Ensure the mutex is initialized
+    assert(lvgl_mux && "esp_lv_adapter_init must be called first"); // Ensure the mutex is initialized
     xSemaphoreGiveRecursive(lvgl_mux); // Release the mutex
 }
 
-bool lvgl_port_notify_rgb_vsync(void)
+bool esp_lv_adapter_notify_rgb_vsync(void)
 {
     BaseType_t need_yield = pdFALSE; // Flag to check if a yield is needed
 #if LVGL_PORT_FULL_REFRESH && (LVGL_PORT_LCD_RGB_BUFFER_NUMS == 3) && (EXAMPLE_LVGL_PORT_ROTATION_DEGREE == 0)

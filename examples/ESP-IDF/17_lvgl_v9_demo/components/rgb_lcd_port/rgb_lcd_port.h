@@ -4,12 +4,14 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
+#include "driver/gpio.h"
 #include "io_extension.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_touch.h"
+#include "esp_lcd_touch_gt911.h"
 #include "esp_lv_adapter.h"
 #define EXAMPLE_LCD_H_RES               (1024)
 #define EXAMPLE_LCD_V_RES               (600)
@@ -44,11 +46,13 @@
 #define EXAMPLE_PIN_NUM_BK_LIGHT        (-1)
 #define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL   (1)
 #define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL  (!EXAMPLE_LCD_BK_LIGHT_ON_LEVEL)
+
+#define EXAMPLE_TOUCH_RST_GPIO          (-1)
+#define EXAMPLE_TOUCH_INT_GPIO          (GPIO_NUM_4)
 esp_err_t waveshare_esp32_s3_rgb_lcd_init(esp_lv_adapter_tear_avoid_mode_t tear_mode,
                                           esp_lv_adapter_rotation_t rotation,
                                           esp_lcd_panel_handle_t *panel_handle,
                                           esp_lcd_touch_handle_t *touch_handle);
-esp_lcd_touch_handle_t touch_gt911_init(void);
 void wavesahre_rgb_lcd_bl_on(void);
 void wavesahre_rgb_lcd_bl_off(void);
 void wavesahre_rgb_lcd_display_window(int16_t Xstart, int16_t Ystart, int16_t Xend, int16_t Yend, uint8_t *Image);
@@ -57,7 +61,5 @@ void waveshare_get_frame_buffer(void **buf1, void **buf2);
 void waveahre_rgb_lcd_set_pclk(uint32_t freq_hz);
 void waveshare_rgb_lcd_restart(void);
 #endif
-
-
 
 
