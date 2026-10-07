@@ -74,7 +74,7 @@
  *      - 270: 270 degree
  *
  */
-#define EXAMPLE_LVGL_PORT_ROTATION_DEGREE  (0)
+#define EXAMPLE_LVGL_PORT_ROTATION_DEGREE  (180)
 
 /**
  * Below configurations are automatically set according to the above configurations, users do not need to modify them.

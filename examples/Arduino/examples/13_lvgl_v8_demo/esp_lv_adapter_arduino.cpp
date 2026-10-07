@@ -155,7 +155,7 @@ static lv_port_flush_probe_t flush_copy_probe(lv_disp_drv_t *drv)
 }
 
 // Inline function to get the next buffer for flushing
-static inline void *flush_get_next_buf(void *panel_handle)
+static inline void *flush_get_next_buf(esp_lcd_panel_handle_t panel_handle)
 {
     return get_next_frame_buffer(panel_handle); // Return the next frame buffer
 }
@@ -178,7 +178,7 @@ static void flush_dirty_copy(void *dst, void *src, lv_port_dirty_area_t *dirty_a
             y_end = dirty_area->inv_areas[i].y2;   // End Y coordinate
 
             // Rotate and copy pixel data from source to destination buffer
-            rotate_copy_pixel(src, dst, x_start, y_start, x_end, y_end, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
+            rotate_copy_pixel((const uint16_t *)src, (uint16_t *)dst, x_start, y_start, x_end, y_end, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
         }
     }
 }
@@ -204,7 +204,7 @@ static void flush_callback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t
 
             // Rotate and copy data from the whole screen LVGL's buffer to the next frame buffer
             next_fb = flush_get_next_buf(panel_handle);
-            rotate_copy_pixel((uint16_t *)color_map, next_fb, offsetx1, offsety1, offsetx2, offsety2, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
+            rotate_copy_pixel((uint16_t *)color_map, (uint16_t *)next_fb, offsetx1, offsety1, offsetx2, offsety2, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
 
             /* Switch the current RGB frame buffer to `next_fb` */
             esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, next_fb);
@@ -321,7 +321,7 @@ void flush_callback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color
     void *next_fb = get_next_frame_buffer(panel_handle); // Get the next frame buffer
 
     /* Rotate and copy dirty area from the current LVGL's buffer to the next RGB frame buffer */
-    rotate_copy_pixel((uint16_t *)color_map, next_fb, offsetx1, offsety1, offsetx2, offsety2, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
+    rotate_copy_pixel((uint16_t *)color_map, (uint16_t *)next_fb, offsetx1, offsety1, offsetx2, offsety2, LV_HOR_RES, LV_VER_RES, EXAMPLE_LVGL_PORT_ROTATION_DEGREE);
 
     /* Switch the current RGB frame buffer to `next_fb` */
     esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, next_fb);

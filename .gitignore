@@ -1,8 +1,6 @@
 # Environmental Variables
-.env
 
 # VS Code
-.vscode/
 
 # ESP-IDF
 build/
@@ -10,3 +8,5 @@ sdkconfig
 sdkconfig.old
 managed_components/
 dependencies.lock
+config.bat
+node_modules
